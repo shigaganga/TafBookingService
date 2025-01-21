@@ -21,7 +21,7 @@ public class BookingsDTO {
 
     private Long booking_id;
 
-  //  @ManyToOne(fetch = FetchType.EAGER,optional = false)
+  //  @ManyToOne(fetch = FetchType.EAGER,optional = false) g
 
 //This means that many Booking records can be linked to one User.
 //The User object is not fetched immediately when the Booking is loaded from the database.
