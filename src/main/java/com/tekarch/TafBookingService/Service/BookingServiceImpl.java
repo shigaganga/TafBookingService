@@ -1,6 +1,7 @@
 package com.tekarch.TafBookingService.Service;
 
 import com.tekarch.TafBookingService.Model.BookingsDTO;
+import com.tekarch.TafBookingService.Model.FlightDTO;
 import com.tekarch.TafBookingService.Service.Interface.BookingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +22,24 @@ public class BookingServiceImpl implements BookingService {
    // private final String DATASOURCE_URL = "http://localhost:8080/bookings";
    @Value("${datasource.url}")
    private String DATASOURCE_URL;
+    @Value("${datasource.url.flight}")
+    private String DATASOURCE_URL_FLIGHT;
     @Override
     public BookingsDTO createBooking(BookingsDTO bookingsDTO) {
-        System.out.println("from booking"+bookingsDTO);
+        String getFlightUrl = DATASOURCE_URL_FLIGHT + "/" + bookingsDTO.getFlight().getFlight_id();
+        FlightDTO flight = restTemplate.getForObject(getFlightUrl, FlightDTO.class);
+        if (flight != null) {
+            if (flight.getAvailable_seats() > 0) {
+                flight.setAvailable_seats(flight.getAvailable_seats() - 1);
+            }else{
+                logger.info(bookingsDTO.getFlight().getFlight_id()+" has 0 seat to book . try another flight");
+            }
+        }
+        restTemplate.put(getFlightUrl, flight);
         ResponseEntity<BookingsDTO> response=restTemplate.postForEntity(DATASOURCE_URL,bookingsDTO, BookingsDTO.class);
         return response.getBody();
     }
+
 
     @Override
     public List<BookingsDTO> getAllBookings() {
